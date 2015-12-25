@@ -5,12 +5,41 @@
 
 {% block page_content %}
 <div class="page-header">
-    <h1>Hello, {% if name %}{{ name }}{% else %}Stranger{% endif %}!</h1>
-    {% if not known %}
-    <p>Pleased to meet you!</p>
-    {% else %}
-    <p>Happy to see you again!</p>
-    {% endif %}
+    <h1>Latest Topics</h1>
 </div>
-{{ wtf.quick_form(form) }}
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script>window.jQuery || document.write('<script src="{{
+                url_for('static', filename='jquery.js') }}">\x3C/script>')
+    </script>
+    <script type=text/javascript>
+        $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+    </script>
+    {% for topic in topics %}
+        <h4>{{ topic.summary }}
+        <a href="{{ url_for('.view_entry', id=topic.id) }}">e</a></h4>
+        <script type=text/javascript>
+            $(function() {
+                $('a#calculate'+{{ topic.id }}).bind('click', function() {
+                    $.getJSON($SCRIPT_ROOT + '/upvote/' + {{ topic.id }},
+                            function(data) {
+                        $("#upvotes" + {{ topic.id }}).text(data.result);
+                    });
+                    return false;
+                });
+            });
+            $(function() {
+                $('a#downvote'+{{ topic.id }}).bind('click', function() {
+                    $.getJSON($SCRIPT_ROOT + '/downvote/' + {{ topic.id }},
+                            function(data) {
+                        $("#downvotes" + {{ topic.id }}).text(data.result);
+                    });
+                    return false;
+                });
+            });
+        </script>
+        <p><a href=# id="calculate{{ topic.id}}">UpVote</a> -
+            <span id="upvotes{{ topic.id }}">{{ topic.upvotes }}</span>
+        <p><a href=# id="downvote{{ topic.id}}">DownVote</a> -
+            <span id="downvotes{{ topic.id }}">{{ topic.downvotes }}</span>
+    {% endfor %}
 {% endblock %}

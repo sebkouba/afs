@@ -19,3 +19,20 @@ class User(db.Model):
 
     def __repr__(self):
         return '<User %r>' % self.username
+
+
+class Topic(db.Model):
+    __tablename__ = 'topics'
+    id = db.Column(db.Integer, primary_key=True)
+    summary = db.Column(db.Text, nullable=False)
+    description = db.Column(db.Text)
+    upvotes = db.Column(db.Integer, default=0)
+    downvotes = db.Column(db.Integer, default=0)
+
+    def upvote(self):
+        self.upvotes += 1
+        return self.upvotes
+
+    def downvote(self):
+        self.downvotes += 1
+        return self.downvotes
